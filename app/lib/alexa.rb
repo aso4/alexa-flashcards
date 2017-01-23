@@ -24,6 +24,6 @@ class Alexa < AlexaSkillsRuby::Handler
   end
 end
 
- 1. ngrok configured to trigger launch intent
- 2. utterances, how slots are configured
- 3. etc.
+ # 1. ngrok configured to trigger launch intent
+ # 2. utterances, how slots are configured
+ # 3. etc.
