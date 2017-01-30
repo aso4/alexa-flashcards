@@ -2,7 +2,7 @@ require 'net/http'
 require 'alexa_skills_ruby'
 
 class AlexaController < ApplicationController
-  #skip_before_action :verify_authenticity_token
+  skip_before_action :verify_authenticity_token
 
   def index
 
