@@ -23,3 +23,10 @@ certificate.pem
 
 # Ignore Byebug command history file.
 .byebug_history
+
+/temp-cert
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
