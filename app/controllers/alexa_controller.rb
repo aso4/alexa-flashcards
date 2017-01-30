@@ -21,6 +21,10 @@ class AlexaController < ApplicationController
 
   end
 
+  def show
+    "Hello, this is Alexa Flashcards Ruby!"
+  end
+
   def haze_intent intent
     result = Net::HTTP.get(URI.parse('http://sghaze.herokuapp.com/'))
 
