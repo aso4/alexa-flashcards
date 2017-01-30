@@ -1,5 +1,5 @@
 class Alexa < AlexaSkillsRuby::Handler
-
+  
   on_launch do
     response.set_output_speech("What's up dog?")
   end
@@ -9,6 +9,10 @@ class Alexa < AlexaSkillsRuby::Handler
     response.set_output_speech_text("Something will happen")
     #response.set_simple_card("title", "content")
     logger.info 'DailyDataIntent processed'
+  end
+
+  on_intent("StartOverIntent") do
+    response.set_output_speech("What's up dog?")
   end
 
   on_intent("AnswerIntent") do

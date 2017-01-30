@@ -1,6 +1,5 @@
 require 'net/http'
 require 'alexa_skills_ruby'
-require 'CustomHandler'
 
 class AlexaController < ApplicationController
   #skip_before_action :verify_authenticity_token
@@ -9,8 +8,9 @@ class AlexaController < ApplicationController
 
     #content_type :json
 
-    handler = CustomHandler.new(application_id: 'amzn1.ask.skill.55efad5c-72fc-45bc-aca5-9e713f352e81', logger: logger)
+    #handler = CustomHandler.new(application_id: 'amzn1.ask.skill.55efad5c-72fc-45bc-aca5-9e713f352e81', logger: logger)
     #signature = { signature => "signature" }
+    "Test test test"
 
     begin
       handler.handle(request.body.read)
