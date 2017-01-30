@@ -22,7 +22,7 @@ class AlexaController < ApplicationController
   end
 
   def show
-    "Hello, this is Alexa Flashcards Ruby!"
+    render "Hello, this is Alexa Flashcards Ruby!"
   end
 
   def haze_intent intent
