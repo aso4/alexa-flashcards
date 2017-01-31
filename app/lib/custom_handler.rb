@@ -13,7 +13,7 @@ class CustomHandler < AlexaSkillsRuby::Handler
   # end
 
   on_launch do
-    response.set_output_speech("What's up dog?")
+    response.set_output_speech_text("What's up dog?")
   end
 
   on_intent("DailyDataIntent") do
