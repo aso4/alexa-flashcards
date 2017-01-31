@@ -14,13 +14,13 @@ class AlexaController < ApplicationController
       handler.handle(request.body.read, hdrs)
       logger.info "handler response is as follows:"
       logger.info handler.response.to_json
-      logger.info(render :json => handler.response)
     rescue AlexaSkillsRuby::InvalidApplicationId => e
       logger.error e.to_s
       403
     end
 
     #render json: {bar:'zzz'}
+    render :json => handler.response
 
   end
 
