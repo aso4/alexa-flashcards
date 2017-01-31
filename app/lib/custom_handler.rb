@@ -1,4 +1,3 @@
-require 'sinatra'
 require 'alexa_skills_ruby'
 
 class CustomHandler < AlexaSkillsRuby::Handler
