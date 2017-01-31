@@ -13,8 +13,8 @@ class AlexaController < ApplicationController
       hdrs = { 'Signature' => request.env['HTTP_SIGNATURE'], 'SignatureCertChainUrl' => request.env['HTTP_SIGNATURECERTCHAINURL'] }
       handler.handle(request.body.read, hdrs)
       logger.info "handler response is as follows:"
-      logger.info handler.response
-      render handler.response
+      logger.info handler.response.to_json
+      render handler.response.as_json
     rescue AlexaSkillsRuby::InvalidApplicationId => e
       logger.error e.to_s
       403
