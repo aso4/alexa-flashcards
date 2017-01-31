@@ -7,12 +7,11 @@ class AlexaController < ApplicationController
   def index
 
     #content_type :json
-    signature = { signature => "signature" }
     handler = CustomHandler.new(application_id: 'amzn1.ask.skill.55efad5c-72fc-45bc-aca5-9e713f352e81', logger: logger)
-    handler.validate(request.body.read, signature)
 
     begin
-      handler.handle(request.body.read)
+      hdrs = { 'Signature' => request.env['HTTP_SIGNATURE'], 'SignatureCertChainUrl' => request.env['HTTP_SIGNATURECERTCHAINURL'] }
+      handler.handle(request.body.read, hdrs)
     rescue AlexaSkillsRuby::InvalidApplicationId => e
       logger.error e.to_s
       403
