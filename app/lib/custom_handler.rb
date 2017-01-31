@@ -23,7 +23,7 @@ class CustomHandler < AlexaSkillsRuby::Handler
     logger.info 'DailyDataIntent processed'
   end
 
-  on_intent("StartOverIntent") do
+  on_intent("AMAZON.StartOverIntent") do
     response.set_output_speech("What's up dog?")
   end
 
