@@ -2,6 +2,11 @@ require 'alexa_skills_ruby'
 
 class CustomHandler < AlexaSkillsRuby::Handler
 
+  on_launch do
+    response.set_output_speech_text("What's up dog?")
+    logger.info 'launch request processed'
+  end
+
   on_intent("AMAZON.StartOverIntent") do
     slots = request.intent.slots
     response.set_output_speech_text("Horoscope Text").to_json
@@ -10,10 +15,6 @@ class CustomHandler < AlexaSkillsRuby::Handler
     #response.set_reprompt_speech_ssml("<speak>Reprompt Horoscope Text</speak>")
     response.set_simple_card("title", "content")
     logger.info 'GetZodiacHoroscopeIntent processed'
-  end
-
-  on_launch do
-    response.set_output_speech_text("What's up dog?")
   end
 
   on_intent("DailyDataIntent") do
