@@ -15,8 +15,8 @@ class CustomHandler < AlexaSkillsRuby::Handler
     #response.set_reprompt_speech_ssml("<speak>Reprompt Horoscope Text</speak>")
     response.set_simple_card("title", "content")
     logger.info 'StartOverIntent processed'
-    logger.info response.serialize_attributes
-    #response.serialize_attributes
+    logger.info response.class
+    response
   end
 
   on_intent("DailyDataIntent") do
