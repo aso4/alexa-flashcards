@@ -7,7 +7,7 @@ class AlexaController < ApplicationController
   def index
 
     #content_type :json
-    handler = CustomHandler.new(application_id: 'amzn1.ask.skill.55efad5c-72fc-45bc-aca5-9e713f352e81', logger: logger)
+    handler = CustomHandler.new(application_id: 'amzn1.ask.skill.8fd7504e-1979-4837-81cc-82db38a26f02', logger: logger)
 
     begin
       hdrs = { 'Signature' => request.env['HTTP_SIGNATURE'], 'SignatureCertChainUrl' => request.env['HTTP_SIGNATURECERTCHAINURL'] }
@@ -25,7 +25,7 @@ class AlexaController < ApplicationController
       #response.set_reprompt_speech_ssml("<speak>Reprompt Horoscope Text</speak>")
       response.set_simple_card("title", "content")
       logger.info 'GetZodiacHoroscopeIntent processed'
-    end    
+    end
 
   end
 
