@@ -24,7 +24,7 @@ class CustomHandler < AlexaSkillsRuby::Handler
   end
 
   on_intent("AMAZON.StartOverIntent") do
-    response.set_output_speech("What's up dog?")
+    response.set_output_speech_text("What's up dog?")
   end
 
   on_intent("AnswerIntent") do
