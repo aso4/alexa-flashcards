@@ -6,7 +6,6 @@ class AlexaController < ApplicationController
 
   def index
 
-    #content_type :json
     handler = CustomHandler.new(application_id: 'amzn1.ask.skill.8fd7504e-1979-4837-81cc-82db38a26f02', logger: logger)
 
     begin
@@ -19,8 +18,7 @@ class AlexaController < ApplicationController
       403
     end
 
-    #render json: {bar:'zzz'}
-    #render :json => handler.response
+    render :json => handler.response
 
   end
 

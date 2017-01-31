@@ -16,7 +16,6 @@ class CustomHandler < AlexaSkillsRuby::Handler
     response.set_simple_card("title", "content")
     logger.info 'StartOverIntent processed'
     logger.info response.class
-    render :json => response
   end
 
   on_intent("DailyDataIntent") do
