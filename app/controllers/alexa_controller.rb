@@ -14,7 +14,7 @@ class AlexaController < ApplicationController
       handler.handle(request.body.read, hdrs)
       logger.info "handler response is as follows:"
       logger.info handler.response
-      handler.response
+      render handler.response
     rescue AlexaSkillsRuby::InvalidApplicationId => e
       logger.error e.to_s
       403
