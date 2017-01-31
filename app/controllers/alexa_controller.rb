@@ -18,21 +18,22 @@ class AlexaController < ApplicationController
       403
     end
 
-    render {
-  "version": "1.0",
-  "response": {
-    "shouldEndSession": true,
-    "outputSpeech": {
-      "type": "PlainText",
-      "text": "Hello Alexa!"
-    },
-    "card": {
-      "type": "Simple",
-      "title": "Greeter",
-      "content": "Hello Alexa!"
-    }
-  }
-}
+    resp = {
+            "version": "1.0",
+            "response": {
+              "shouldEndSession": true,
+              "outputSpeech": {
+                "type": "PlainText",
+                "text": "Hello Alexa!"
+              },
+              "card": {
+                "type": "Simple",
+                "title": "Greeter",
+                "content": "Hello Alexa!"
+              }
+            }
+          }
+    render resp
 #:json => handler.response
 
   end
