@@ -17,6 +17,8 @@ class AlexaController < ApplicationController
       403
     end
 
+    render json: {bar:'zzz'}
+
   end
 
   def show
