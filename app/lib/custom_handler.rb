@@ -14,7 +14,9 @@ class CustomHandler < AlexaSkillsRuby::Handler
     response.set_reprompt_speech_text("Reprompt Horoscope Text")
     #response.set_reprompt_speech_ssml("<speak>Reprompt Horoscope Text</speak>")
     response.set_simple_card("title", "content")
-    logger.info 'GetZodiacHoroscopeIntent processed'
+    logger.info 'StartOverIntent processed'
+    logger.info response.class
+    render response
   end
 
   on_intent("DailyDataIntent") do
