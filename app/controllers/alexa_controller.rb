@@ -20,7 +20,7 @@ class AlexaController < ApplicationController
     end
 
     #render json: {bar:'zzz'}
-    render :json => handler.response
+    #render :json => handler.response
 
   end
 
