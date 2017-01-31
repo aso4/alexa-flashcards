@@ -33,7 +33,7 @@ class AlexaController < ApplicationController
               }
             }
           }
-    render resp
+    render :json => resp
 #:json => handler.response
 
   end
