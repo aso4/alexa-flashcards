@@ -2,7 +2,7 @@ require 'alexa_skills_ruby'
 
 class CustomHandler < AlexaSkillsRuby::Handler
 
-  on_intent("GetZodiacHoroscopeIntent") do
+  on_intent("AMAZON.StartOverIntent") do
     slots = request.intent.slots
     response.set_output_speech_text("Horoscope Text")
     #response.set_output_speech_ssml("<speak><p>Horoscope Text</p><p>More Horoscope text</p></speak>")
