@@ -1,10 +1,13 @@
-require 'alexa_skills_ruby'
+require 'alexa_rubykit'
 
 class CustomHandler < AlexaSkillsRuby::Handler
 
   on_launch do
     response.set_output_speech_text("What's up dog?")
     logger.info 'launch request processed'
+    #   request = AlexaRubykit::Response.new
+    #   request.add_speech('Ruby is running. Ready')
+    #   request.build_response
   end
 
   on_intent("AMAZON.StartOverIntent") do

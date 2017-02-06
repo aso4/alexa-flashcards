@@ -1,39 +1,42 @@
 #require 'net/http'
 #require 'alexa_skills_ruby'
+require 'alexa_rubykit'
 
 class AlexaController < ApplicationController
   skip_before_action :verify_authenticity_token
 
   def index
 
-    handler = CustomHandler.new(application_id: 'amzn1.ask.skill.8fd7504e-1979-4837-81cc-82db38a26f02', logger: logger)
+    # handler = CustomHandler.new(application_id: 'amzn1.ask.skill.8fd7504e-1979-4837-81cc-82db38a26f02', logger: logger)
+    #
+    # begin
+    #   hdrs = { 'Signature' => request.env['HTTP_SIGNATURE'], 'SignatureCertChainUrl' => request.env['HTTP_SIGNATURECERTCHAINURL'] }
+    #   handler.handle(request.body.read, hdrs)
+    #   logger.info "handler response is as follows:"
+    #   logger.info handler.response.to_json
+    # rescue AlexaSkillsRuby::InvalidApplicationId => e
+    #   logger.error e.to_s
+    #   403
+    request = AlexaRubykit::Response.new
+    request.add_speech('Ruby is running. Ready')
+    request.build_response
 
-    begin
-      hdrs = { 'Signature' => request.env['HTTP_SIGNATURE'], 'SignatureCertChainUrl' => request.env['HTTP_SIGNATURECERTCHAINURL'] }
-      handler.handle(request.body.read, hdrs)
-      logger.info "handler response is as follows:"
-      logger.info handler.response.to_json
-    rescue AlexaSkillsRuby::InvalidApplicationId => e
-      logger.error e.to_s
-      403
-    end
-
-    resp = {
-            "version": "1.0",
-            "response": {
-              "shouldEndSession": true,
-              "outputSpeech": {
-                "type": "PlainText",
-                "text": "Hello Alexa!"
-              },
-              "card": {
-                "type": "Simple",
-                "title": "Greeter",
-                "content": "Hello Alexa!"
-              }
-            }
-          }
-    render :json => resp
+    # resp = {
+    #         "version": "1.0",
+    #         "response": {
+    #           "shouldEndSession": true,
+    #           "outputSpeech": {
+    #             "type": "PlainText",
+    #             "text": "Hello Alexa!"
+    #           },
+    #           "card": {
+    #             "type": "Simple",
+    #             "title": "Greeter",
+    #             "content": "Hello Alexa!"
+    #           }
+    #         }
+    #       }
+    render :json => request
 #:json => handler.response
 
   end
