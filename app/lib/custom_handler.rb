@@ -3,7 +3,9 @@ require 'alexa_skills_ruby'
 class CustomHandler < AlexaSkillsRuby::Handler
 
   on_launch do
-    response.set_output_speech_text("What's up dog?")
+    #response.set_output_speech_text("What's up dog?")
+    r = AlexaSkillsRuby::JsonObjects::SkillsRequest.new(launch_request_json)
+    render r
     logger.info 'launch request processed'
   end
 

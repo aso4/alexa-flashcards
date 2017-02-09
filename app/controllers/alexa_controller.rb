@@ -11,32 +11,50 @@ class AlexaController < ApplicationController
     begin
       hdrs = { 'Signature' => request.env['HTTP_SIGNATURE'], 'SignatureCertChainUrl' => request.env['HTTP_SIGNATURECERTCHAINURL'] }
       handler.handle(request.body.read, hdrs)
-      logger.info "handler response is as follows:"
-      logger.info handler.response.to_json
-      logger.info "the request body is as follows:"
-      logger.info request.body.read
+      # handler renders as follows
+      # handler.response.to_json
+
+      # {"shouldEndSession":true,
+      #   "outputSpeech":{
+      #     "type":"PlainText",
+      #     "text":"Start New Deck Text"},
+      #   "card":{
+      #     "type":"Simple",
+      #     "title":"title",
+      #     "content":"content"},
+      #   "reprompt":{
+      #     "outputSpeech":{
+      #       "type":"PlainText",
+      #       "text":"Start New Deck Reprompt Text"}
+      #       }
+      #     }
+
+      # whereas the following code is valid for alexa
+      # resp = {
+      #         "version": "1.0",
+      #         "response": {
+      #           "shouldEndSession": true,
+      #           "outputSpeech": {
+      #             "type": "PlainText",
+      #             "text": "Hello Alexa!"
+      #           },
+      #           "card": {
+      #             "type": "Simple",
+      #             "title": "Greeter",
+      #             "content": "Hello Alexa!"
+      #           }
+      #         }
+      #       }
+      # render :json => resp
+
+      # the request is being read properly via request.body.read
+
     rescue AlexaSkillsRuby::InvalidApplicationId => e
       logger.error e.to_s
       403
     end
 
-    # the following code should be rendered in json
-    resp = {
-            "version": "1.0",
-            "response": {
-              "shouldEndSession": true,
-              "outputSpeech": {
-                "type": "PlainText",
-                "text": "Hello Alexa!"
-              },
-              "card": {
-                "type": "Simple",
-                "title": "Greeter",
-                "content": "Hello Alexa!"
-              }
-            }
-          }
-    render :json => resp
+
 #:json => handler.response
 
   end
