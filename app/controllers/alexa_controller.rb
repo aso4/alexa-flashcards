@@ -11,6 +11,8 @@ class AlexaController < ApplicationController
     begin
       hdrs = { 'Signature' => request.env['HTTP_SIGNATURE'], 'SignatureCertChainUrl' => request.env['HTTP_SIGNATURECERTCHAINURL'] }
       handler.handle(request.body.read, hdrs)
+      logger.info handler.response
+      render handler.response
       # handler renders as follows
       # handler.response.to_json
 
