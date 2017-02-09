@@ -16,13 +16,31 @@ class AlexaController < ApplicationController
     request.body.rewind
     AlexaWebService::AlexaVerify.new(request.env, request.body.read)
 
-    @response = AlexaResponse.new
-    @response.spoken_response = "Hello user"
-    @response.end_session = true
-    logger.info "response is: #{@response.with_card.to_json}"
+    # Uncomment this and include your skill id before submitting application for certification:
+    # halt 400, "Invalid Application ID" unless @application_id == "your-skill-id"
 
-    render json: @response.with_card
+    r = AlexaResponse.new
 
+    if @echo_request.launch_request?
+      r.end_session = false
+      r.spoken_response = "Are you ready for a quiz?"
+
+    elsif @echo_request.intent_name == "AMAZON.StartOverIntent"
+      r.spoken_response = "You chose to start over. Are you ready for your study questions?"
+      r.end_session = false
+
+    elsif @echo_request.intent_name == "DontKnowIntent"
+      r.spoken_response = "Too bad"
+      r.end_session = true
+
+    # These are spelled out explicitly for demonstration purposes. Obviously, this could end with an "else" clause.
+    # And, outside the conditional:  r.end_session ||= false
+    elsif @echo_request.session_ended_request?
+      r.end_session = true
+    elsif @echo_request.intent_name == "AMAZON.StopIntent" ||  @echo_request.intent_name == "AMAZON.CancelIntent"
+      r.end_session = true
+    end
+    render json: r.with_card
   end
 
   def show
