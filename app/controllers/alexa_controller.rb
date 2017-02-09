@@ -22,7 +22,7 @@ class AlexaController < ApplicationController
       @echo_request = AlexaWebService::AlexaRequest.new(request_json)
       response = AlexaWebService::Response.new
 
-      if @echo_request.launch_request
+      if @echo_request.intent_request?
         response.spoken_response = "Hello user"
         response.end_session = true
       end
