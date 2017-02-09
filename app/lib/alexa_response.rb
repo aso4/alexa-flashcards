@@ -1,6 +1,6 @@
-require 'alexa_skills_ruby'
+require 'alexa_web_service'
 
-class CustomHandler < AlexaSkillsRuby::Handler
+class AlexaResponse < AlexaWebService::Response
 
   on_launch do
     #response.set_output_speech_text("What's up dog?")
