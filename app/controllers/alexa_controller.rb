@@ -11,6 +11,7 @@ class AlexaController < ApplicationController
     params.merge!(JSON.parse(@data))
     @echo_request = AlexaWebService::AlexaRequest.new(JSON.parse(@data))
     @application_id = @echo_request.application_id
+    deck = Flashcards.new
 
     # If the request body has been read, you need to rewind it.
     request.body.rewind
@@ -22,28 +23,23 @@ class AlexaController < ApplicationController
     r = AlexaResponse.new
 
     if @echo_request.launch_request?
-      r.end_session = false
       r.spoken_response = "Are you ready for a quiz?"
-
     elsif @echo_request.intent_name == "AMAZON.StartOverIntent"
-      r.spoken_response = "You chose to start over. Are you ready for your study questions?"
-      r.end_session = false
-
+      @newQuestion = deck.getSample
+      r.spoken_response = "You chose to start over. Here is your next flashcard: #{@newQuestion[2]}.
+      What is the correct answer? #{@newQuestion[3].join(", ")}"
     elsif @echo_request.intent_name == "DontKnowIntent"
-      r.spoken_response = "Too bad"
-      r.end_session = true
-
-    # These are spelled out explicitly for demonstration purposes. Obviously, this could end with an "else" clause.
-    # And, outside the conditional:  r.end_session ||= false
+      r.spoken_response = "The answer is #{deck.answers}. Next question."
     elsif @echo_request.session_ended_request?
       r.end_session = true
     elsif @echo_request.intent_name == "AMAZON.StopIntent" ||  @echo_request.intent_name == "AMAZON.CancelIntent"
       r.end_session = true
     end
+    r.end_session ||= false
     render json: r.with_card
   end
 
   def show
-    render "Hello, this is Alexa Flashcards Ruby!"
+    render "The Alexa Flashcards: Ruby server is up and running!"
   end
 end
