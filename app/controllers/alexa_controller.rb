@@ -33,15 +33,12 @@ class AlexaController < ApplicationController
       r.end_session = false
       r.spoken_response = "Starting over. Here is your next flashcard: #{@newQuestion[2]}.
       What is the correct answer? #{@newQuestion[3].join(", ")}"
-      r.add_attribute("reprompt", "#{@newQuestion[2]}. What is the correct answer? #{@newQuestion[3].join(", ")}")
-      r.add_attribute("currentQuestionIndex", @newQuestion[0])
-      r.add_attribute("correctAnswerIndex", @newQuestion[1])
-      r.add_attribute("correctAnswerText", @newQuestion[4])
-
+      add_session_attributes(r)
     elsif @echo_request.intent_name == "DontKnowIntent"
       @newQuestion = deck.getSample
       r.spoken_response = "The answer is #{@newQuestion[4]}. Next question: #{@newQuestion[2]}.
       What is the correct answer? #{@newQuestion[3].join(", ")}"
+      add_session_attributes(r)
     elsif @echo_request.intent_name == "AnswerIntent" || @echo_request.intent_name == "AnswerOnlyIntent"
       if @echo_request.session_attributes?
         #logger.info "session attributes registered"
@@ -53,11 +50,14 @@ class AlexaController < ApplicationController
           @newQuestion = deck.getSample
           r.spoken_response = "That is correct! Next question: #{@newQuestion[2]}.
           What is the correct answer? #{@newQuestion[3].join(", ")}"
+          add_session_attributes(r)
         else
           r.end_session = false
-          r.spoken_response = "Sorry, that is incorrect. The answer is #{@newQuestion[1]}, #{@newQuestion[4]}.
+          @newQuestion = deck.getSample
+          r.spoken_response = "Sorry, that is incorrect. The answer is #{@echo_request.attributes["correctAnswerIndex"]}, #{@echo_request.attributes["correctAnswerText"]}.
           Let's try another question: #{@newQuestion[2]}.
           What is the correct answer? #{@newQuestion[3].join(", ")}"
+          add_session_attributes(r)
         end
       else
         logger.info "session data was lost"
@@ -69,10 +69,18 @@ class AlexaController < ApplicationController
       r.end_session = true
     end
     r.end_session ||= false
-    render json: r.with_card
+    render json: r.without_card
   end
 
   def show
     render "The Alexa Flashcards: Ruby server is up and running!"
+  end
+
+  private
+  def add_session_attributes(response)
+    response.add_attribute("reprompt", "#{@newQuestion[2]}. What is the correct answer? #{@newQuestion[3].join(", ")}")
+    response.add_attribute("currentQuestionIndex", @newQuestion[0])
+    response.add_attribute("correctAnswerIndex", @newQuestion[1])
+    response.add_attribute("correctAnswerText", @newQuestion[4])
   end
 end
