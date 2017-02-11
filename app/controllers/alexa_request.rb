@@ -44,6 +44,10 @@
 			request_type == "SessionEndedRequest"
 		end
 
+		def session_attributes?
+			true if @attributes
+		end
+
 		private
 		def build_struct(hash)
 			unless hash.nil?
