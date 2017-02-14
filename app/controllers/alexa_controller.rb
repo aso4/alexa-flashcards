@@ -119,6 +119,18 @@ class AlexaController < ApplicationController
     render "The Alexa Flashcards: Ruby server is up and running!"
   end
 
+  def redirect
+    client = Signet::OAuth2::Client.new({
+      client_id: ENV['GA_CLIENT_ID'],
+      client_secret: ENV['GA_CLIENT_SECRET'],
+      authorization_uri: 'https://accounts.google.com/o/oauth2/auth',
+      scope: Google::Apis::AnalyticsV3::AUTH_ANALYTICS_READONLY,
+      redirect_uri: 'http://localhost:3000'
+    })
+
+    redirect_to client.authorization_uri.to_s
+  end
+
   private
   def add_session_attributes(response)
     response.add_attribute("repeatQuestion", "#{@newQuestion[2]}. What is the correct answer? #{@newQuestion[3].join(", ")}")

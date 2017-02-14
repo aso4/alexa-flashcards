@@ -6,6 +6,8 @@ git_source(:github) do |repo_name|
 end
 
 gem 'alexa_web_service'
+gem 'figaro'
+gem 'google-api-client', '~> 0.9', require: 'google/apis/analytics_v3'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.0.1'
