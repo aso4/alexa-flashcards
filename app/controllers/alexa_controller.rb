@@ -22,10 +22,9 @@ class AlexaController < ApplicationController
     # halt 400, "Invalid Application ID" unless @application_id == "your-skill-id"
 
     r = AlexaResponse.new
-    @newQuestion = deck.getSample #moved from StartOverIntent
+    @newQuestion = deck.getSample
 
     if @echo_request.intent_name == "LaunchIntent"
-      #logger.info "ATTRIBUTES ARE: #{@echo_request.application_id} #{@echo_request.user_id} #{@echo_request.access_token} #{@echo_request.session_id}"
       logger.info "onLaunch requestId= #{@echo_request.request_id}, sessionId= #{@echo_request.session_id}"
       r.spoken_response = "Welcome to Ruby Flashcards. Are you ready to test your Ruby knowledge? Say new flashcard, or help to begin."
 
@@ -33,19 +32,21 @@ class AlexaController < ApplicationController
       r.end_session = false
       r.spoken_response = "New card. Here is your next question: #{@newQuestion[2]}.
       What is the correct answer? #{@newQuestion[3].join(", ")}. You can say one, two, three, or four. For more response options, say help."
-      r.reprompt_text = "sorry, I didn't couldn't catch what you were saying.
+      r.reprompt_text = "sorry, I couldn't catch what you were saying.
       say the answer in a sentence. for example, the answer is one.
       you can also say i don’t know, skip, or repeat the question"
       add_session_attributes(r)
+
     elsif @echo_request.intent_name == "DontKnowIntent"
       r.end_session = false
       @newQuestion = deck.getSample
       r.spoken_response = "The answer is #{@newQuestion[4]}. Next question: #{@newQuestion[2]}.
       What is the correct answer? #{@newQuestion[3].join(", ")}"
-      r.reprompt_text = "sorry, I didn't couldn't catch what you were saying.
-      say the answer in a sentence. for example, the answer is one.
+      r.reprompt_text = "sorry, I couldn't catch what you were saying.
+      try saying the answer in a sentence. for example, the answer is one.
       you can also say i don’t know, skip, or repeat the question"
       add_session_attributes(r)
+
     elsif @echo_request.intent_name == "AMAZON.HelpIntent"
       r.end_session = false
       @newQuestion = deck.getSample
@@ -57,46 +58,60 @@ class AlexaController < ApplicationController
       if you don’t know the answer or would like to skip, you can say i don’t know or skip.
       to repeat the question, say repeat, repeat the the question, say it again, or say the question again."
       add_session_attributes(r)
-    elsif @echo_request.intent_name == "AnswerIntent" || @echo_request.intent_name == "AnswerOnlyIntent" || @echo_request.intent_name == "RepeatIntent"
+
+    elsif @echo_request.intent_name == "AnswerIntent" || @echo_request.intent_name == "AnswerOnlyIntent" || @echo_request.intent_name == "AMAZON.RepeatIntent"
       if @echo_request.session_attributes?
-        #logger.info "session attributes registered"
-        #logger.info "#{@echo_request.session_attributes?}"
-        logger.info "#{@echo_request.attributes["correctAnswerIndex"]}"
-        logger.info "#{@echo_request.slots.answer.to_i}" #this is the response
+
         if @echo_request.intent_name == "AMAZON.RepeatIntent"
           r.end_session = false
-          r.spoken_response = "repeat intent"
-          add_session_attributes(r)
+          logger.info "ATTRIBUTES ARE: #{@echo_request.attributes}"
+          r.add_attribute("currentQuestionIndex", @echo_request.attributes["currentQuestionIndex"])
+          r.add_attribute("correctAnswerText", @echo_request.attributes["correctAnswerText"])
+          r.add_attribute("repeatQuestion", @echo_request.attributes["repeatQuestion"])
+          r.add_attribute("correctAnswerIndex", @echo_request.attributes["correctAnswerIndex"])
+          r.spoken_response = "#{@echo_request.attributes["repeatQuestion"]}"
+
         elsif @echo_request.attributes["correctAnswerIndex"] == @echo_request.slots.answer.to_i
           r.end_session = false
           @newQuestion = deck.getSample
           r.spoken_response = "That is correct! Next question: #{@newQuestion[2]}.
           What is the correct answer? #{@newQuestion[3].join(", ")}"
-          r.reprompt_text = "sorry, I didn't couldn't catch what you were saying.
-          say the answer in a sentence. for example, the answer is one.
+          r.reprompt_text = "sorry, I couldn't catch what you were saying.
+          try saying the answer in a sentence. for example, the answer is one.
           you can also say i don’t know, skip, or repeat the question"
+          r.card_title = "Correct!"
+          r.card_content "#{@echo_request.attributes["repeatQuestion"]}\n#{@echo_request.attributes["correctAnswerText"]}"
           add_session_attributes(r)
+
         else
           r.end_session = false
           @newQuestion = deck.getSample
           r.spoken_response = "Sorry, that is incorrect. The answer is #{@echo_request.attributes["correctAnswerIndex"]}, #{@echo_request.attributes["correctAnswerText"]}.
           Let's try another question: #{@newQuestion[2]}.
           What is the correct answer? #{@newQuestion[3].join(", ")}"
-          r.reprompt_text = "sorry, I didn't couldn't catch what you were saying.
-          say the answer in a sentence. for example, the answer is one.
+          r.reprompt_text = "sorry, I couldn't catch what you were saying.
+          try saying the answer in a sentence. for example, the answer is one.
           you can also say i don’t know, skip, or repeat the question"
+          r.card_title = "Sorry, that's incorrect."
+          r.card_content "#{@echo_request.attributes["repeatQuestion"]}\nThe correct answer is #{@echo_request.attributes["correctAnswerText"]}"
           add_session_attributes(r)
         end
       else
         logger.info "session data was lost"
-        r.spoken_response "session data was lost"
+        r.spoken_response = "session data was lost"
       end
+
     elsif @echo_request.session_ended_request?
       r.end_session = true
+      r.spoken_response = "session has ended"
+
     elsif @echo_request.intent_name == "AMAZON.StopIntent" ||  @echo_request.intent_name == "AMAZON.CancelIntent"
       r.end_session = true
+      r.spoken_response = "you have chosen to stop. session has ended"
     end
-    r.end_session ||= false
+
+    r.end_session ||= true
+    r.spoken_response = "session has ended. say main menu, new flashcard, or help to begin again."
     render json: r.without_card
   end
 
