@@ -1,6 +1,8 @@
 require 'alexa_web_service'
 require 'httparty'
 require 'json'
+#require 'google/apis/analytics_v3'
+#require 'signet/oauth_2/client'
 
 class AlexaController < ApplicationController
   skip_before_action :verify_authenticity_token
@@ -121,14 +123,70 @@ class AlexaController < ApplicationController
 
   def redirect
     client = Signet::OAuth2::Client.new({
-      client_id: ENV['GA_CLIENT_ID'],
-      client_secret: ENV['GA_CLIENT_SECRET'],
+      client_id: ENV.fetch('GA_CLIENT_ID'),
+      client_secret: ENV.fetch('GA_CLIENT_SECRET'),
       authorization_uri: 'https://accounts.google.com/o/oauth2/auth',
       scope: Google::Apis::AnalyticsV3::AUTH_ANALYTICS_READONLY,
-      redirect_uri: 'http://localhost:3000'
+      redirect_uri: 'http://32acf0c3.ngrok.io/oauth2callback'
     })
 
     redirect_to client.authorization_uri.to_s
+  end
+
+  #@token = AccessToken.new('placeholder')
+  #@code = ''
+
+  def callback
+    client = Signet::OAuth2::Client.new({
+      client_id: ENV.fetch('GA_CLIENT_ID'),
+      client_secret: ENV.fetch('GA_CLIENT_SECRET'),
+      token_credential_uri: 'https://accounts.google.com/o/oauth2/token',
+      redirect_uri: 'http://32acf0c3.ngrok.io/oauth2callback',
+      code: params['code']
+    })
+
+    #logger.info "CLIENT METHODS: #{client.methods}"
+    #logger.info "CLIENT fetch_access_token CALLED: #{client.orig_fetch_access_token!}"
+    #ya29.GlzzA_ZyewobSiiWLR057Dd3zHPQ7oxPJTBU-yz97mXrMnGKBQ8Qkkm0MPi9c_7E_D_MHSHl_zWlx_VItH0Mz9qn2AbGke5v1J7P3r__TsqZLmiE46cQAi_wOAovCA
+    response = client.fetch_access_token!
+
+    #@code = params['code']
+    set_code(params['code'])
+    #@token = AccessToken.new(response['access_token'])
+    set_token(response['access_token'])
+    logger.info "code: #{@code}"
+    #logger.info "token is #{response}"
+    logger.info "set_token #{@token}"
+    #logger.info "params are #{params.as_json}" #param doesn't include access token.
+    redirect_to url_for(:action => :analytics)
+  end
+
+  def analytics
+    client = Signet::OAuth2::Client.new({
+      access_token: @token, #'ya29.GlzzA8vMthZTdBm8rBTJEruO3QCrihTCpcmZylxML8r79PFaaJ56gYuzqq9P3re2DrlcpTja9UZOq9wnORZMe_QQzN3WmCjb82msGitMuckD2buu7vqi3oCe-l1qwA',
+      expires_in: 3600
+    })
+
+    service = Google::Apis::AnalyticsV3::AnalyticsService.new
+
+    service.authorization = client
+
+    #logger.info "#analytics PARAMS: #{params.as_json}"
+    #logger.info "SERVICE AUTHORIZATION #{service.authorization}"
+    logger.info "TOKEN: #{@token}"
+    #logger.info "SERVICE IS: #{service.authorization}"
+
+    @account_summaries = service.list_account_summaries
+  end
+
+  attr_reader :token
+
+  def set_token(token)
+    @token = token
+  end
+
+  def set_code(code)
+    @code = code
   end
 
   private
@@ -138,4 +196,6 @@ class AlexaController < ApplicationController
     response.add_attribute("correctAnswerIndex", @newQuestion[1])
     response.add_attribute("correctAnswerText", @newQuestion[4])
   end
+
+
 end
