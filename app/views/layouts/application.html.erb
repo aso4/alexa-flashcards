@@ -11,5 +11,23 @@
 
 <body>
   Hello and welcome to Ruby Flashcards for Alexa!
+
+  <ul>
+    <% @account_summaries.items.each do |item| %>
+      <li><%= item.name %> (<%= item.id %>)
+        <ul>
+          <% item.web_properties.each do |property| %>
+            <li><%= property.name %> (<%= property.id %>)
+              <ul>
+                <% property.profiles.each do |profile| %>
+                  <li><%= profile.name %> (<%= profile.id %>)</li>
+                <% end %>
+              </ul>
+            </li>
+          <% end %>
+        </ul>
+      </li>
+    <% end %>
+  </ul>  
 </body>
 </html>
