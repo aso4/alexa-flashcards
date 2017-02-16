@@ -1,8 +1,6 @@
 require 'alexa_web_service'
 require 'httparty'
 require 'json'
-#require 'google/apis/analytics_v3'
-#require 'signet/oauth_2/client'
 
 class AlexaController < ApplicationController
   skip_before_action :verify_authenticity_token
@@ -11,7 +9,6 @@ class AlexaController < ApplicationController
 
     @data = request.body.read
     params.merge!(JSON.parse(@data))
-    #@echo_request = AlexaWebService::AlexaRequest.new(JSON.parse(@data))
     @echo_request = AlexaRequest.new(JSON.parse(@data))
     @application_id = @echo_request.application_id
     deck = Flashcards.new
@@ -27,7 +24,6 @@ class AlexaController < ApplicationController
     @newQuestion = deck.getSample
 
     if @echo_request.intent_name == "LaunchIntent"
-      logger.info "onLaunch requestId= #{@echo_request.request_id}, sessionId= #{@echo_request.session_id}"
       r.spoken_response = "Welcome to Ruby Flashcards. Are you ready to test your Ruby knowledge? Say new flashcard, or help to begin."
 
     elsif @echo_request.intent_name == "AMAZON.StartOverIntent"
@@ -39,15 +35,15 @@ class AlexaController < ApplicationController
       you can also say i don’t know, skip, or repeat the question"
       add_session_attributes(r)
 
-    elsif @echo_request.intent_name == "DontKnowIntent"
+    elsif @echo_request.intent_name == "DontKnowIntent" #alexa doesn't understand what you're saying
       r.end_session = false
-      @newQuestion = deck.getSample
-      r.spoken_response = "The answer is #{@newQuestion[4]}. Next question: #{@newQuestion[2]}.
-      What is the correct answer? #{@newQuestion[3].join(", ")}"
-      r.reprompt_text = "sorry, I couldn't catch what you were saying.
+      r.add_attribute("currentQuestionIndex", @echo_request.attributes["currentQuestionIndex"])
+      r.add_attribute("correctAnswerText", @echo_request.attributes["correctAnswerText"])
+      r.add_attribute("repeatQuestion", @echo_request.attributes["repeatQuestion"])
+      r.add_attribute("correctAnswerIndex", @echo_request.attributes["correctAnswerIndex"])
+      r.spoken_response = "sorry, I couldn't catch what you were saying.
       try saying the answer in a sentence. for example, the answer is one.
       you can also say i don’t know, skip, or repeat the question"
-      add_session_attributes(r)
 
     elsif @echo_request.intent_name == "AMAZON.HelpIntent"
       r.end_session = false
@@ -66,7 +62,6 @@ class AlexaController < ApplicationController
 
         if @echo_request.intent_name == "AMAZON.RepeatIntent"
           r.end_session = false
-          logger.info "ATTRIBUTES ARE: #{@echo_request.attributes}"
           r.add_attribute("currentQuestionIndex", @echo_request.attributes["currentQuestionIndex"])
           r.add_attribute("correctAnswerText", @echo_request.attributes["correctAnswerText"])
           r.add_attribute("repeatQuestion", @echo_request.attributes["repeatQuestion"])
@@ -82,7 +77,7 @@ class AlexaController < ApplicationController
           try saying the answer in a sentence. for example, the answer is one.
           you can also say i don’t know, skip, or repeat the question"
           r.card_title = "Correct!"
-          r.card_content "#{@echo_request.attributes["repeatQuestion"]}\n#{@echo_request.attributes["correctAnswerText"]}"
+          r.card_content = "#{@newQuestion[2]}\n The correct answer is #{@newQuestion[4]}"
           add_session_attributes(r)
 
         else
@@ -95,7 +90,7 @@ class AlexaController < ApplicationController
           try saying the answer in a sentence. for example, the answer is one.
           you can also say i don’t know, skip, or repeat the question"
           r.card_title = "Sorry, that's incorrect."
-          r.card_content "#{@echo_request.attributes["repeatQuestion"]}\nThe correct answer is #{@echo_request.attributes["correctAnswerText"]}"
+          r.card_content = "#{@newQuestion[2]}\n The correct answer is #{@newQuestion[4]}"
           add_session_attributes(r)
         end
       else
@@ -112,8 +107,8 @@ class AlexaController < ApplicationController
       r.spoken_response = "you have chosen to stop. session has ended"
     end
 
-    r.end_session ||= true
-    r.spoken_response = "session has ended. say main menu, new flashcard, or help to begin again."
+    r.end_session ||= false
+    #r.spoken_response = "session has ended. say main menu, new flashcard, or help to begin again." #this line is causing problems
     render json: r.without_card
   end
 
@@ -169,4 +164,6 @@ class AlexaController < ApplicationController
     response.add_attribute("correctAnswerIndex", @newQuestion[1])
     response.add_attribute("correctAnswerText", @newQuestion[4])
   end
+
+
 end
