@@ -116,47 +116,6 @@ class AlexaController < ApplicationController
     render "The Alexa Flashcards: Ruby server is up and running!"
   end
 
-  def redirect
-    client = Signet::OAuth2::Client.new({
-      client_id: ENV.fetch('GA_CLIENT_ID'),
-      client_secret: ENV.fetch('GA_CLIENT_SECRET'),
-      authorization_uri: 'https://accounts.google.com/o/oauth2/auth',
-      scope: Google::Apis::AnalyticsV3::AUTH_ANALYTICS_READONLY,
-      redirect_uri: 'http://396c70ab.ngrok.io/oauth2callback'
-    })
-
-    redirect_to client.authorization_uri.to_s
-  end
-
-  def callback
-    client = Signet::OAuth2::Client.new({
-      client_id: ENV.fetch('GA_CLIENT_ID'),
-      client_secret: ENV.fetch('GA_CLIENT_SECRET'),
-      token_credential_uri: 'https://accounts.google.com/o/oauth2/token',
-      redirect_uri: 'http://396c70ab.ngrok.io/oauth2callback',
-      code: params['code']
-    })
-
-    response = client.fetch_access_token!
-    at = AccessToken.create!(token: response["access_token"])
-    redirect_to url_for(:action => :analytics)
-  end
-
-  def analytics
-    client = Signet::OAuth2::Client.new({
-      access_token: AccessToken.last.token,
-      expires_in: 3600
-    })
-
-    service = Google::Apis::AnalyticsV3::AnalyticsService.new
-
-    service.authorization = client
-
-    logger.info "#analytics PARAMS: #{params.as_json}"
-
-    @account_summaries = service.list_account_summaries
-  end
-
   private
   def add_session_attributes(response)
     response.add_attribute("repeatQuestion", "#{@newQuestion[2]}. What is the correct answer? #{@newQuestion[3].join(", ")}")
