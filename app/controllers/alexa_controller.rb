@@ -133,9 +133,6 @@ class AlexaController < ApplicationController
     redirect_to client.authorization_uri.to_s
   end
 
-  #@token = AccessToken.new('placeholder')
-  #@code = ''
-
   def callback
     client = Signet::OAuth2::Client.new({
       client_id: ENV.fetch('GA_CLIENT_ID'),
@@ -145,19 +142,14 @@ class AlexaController < ApplicationController
       code: params['code']
     })
 
-    #logger.info "CLIENT METHODS: #{client.methods}"
-    #logger.info "CLIENT fetch_access_token CALLED: #{client.orig_fetch_access_token!}"
-    #ya29.GlzzA_ZyewobSiiWLR057Dd3zHPQ7oxPJTBU-yz97mXrMnGKBQ8Qkkm0MPi9c_7E_D_MHSHl_zWlx_VItH0Mz9qn2AbGke5v1J7P3r__TsqZLmiE46cQAi_wOAovCA
     response = client.fetch_access_token!
     at = AccessToken.create!(token: response["access_token"])
-    logger.info "ACCESS TOKEN: #{at.token}"
-    logger.info "params are #{params.as_json}" #param doesn't include access token.
     redirect_to url_for(:action => :analytics)
   end
 
   def analytics
     client = Signet::OAuth2::Client.new({
-      access_token: AccessToken.last.token,#'ya29.GlzzA31vBqSF4gKzAghd4Idf7VgpsNDxilOK63kVtuFowJfgBJmJ7cKfQpkN8vpcmrmjXPH3IMaMoOMls-2LcyiAAK1Uph_FyDPgh9Kjj-Da1WgLt_yZ_id_z98p-g',
+      access_token: AccessToken.last.token,
       expires_in: 3600
     })
 
@@ -166,10 +158,6 @@ class AlexaController < ApplicationController
     service.authorization = client
 
     logger.info "#analytics PARAMS: #{params.as_json}"
-    #logger.info "SERVICE AUTHORIZATION #{service.authorization}"
-    #logger.info "TOKEN: #{@token}" #token doesn't exist because no data persistence on browser refresh
-    #logger.info "SESSION: #{session}" #session hasn't been created yet
-    #logger.info "SERVICE IS: #{service.authorization}"
 
     @account_summaries = service.list_account_summaries
   end
@@ -181,6 +169,4 @@ class AlexaController < ApplicationController
     response.add_attribute("correctAnswerIndex", @newQuestion[1])
     response.add_attribute("correctAnswerText", @newQuestion[4])
   end
-
-
 end
