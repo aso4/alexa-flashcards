@@ -4,11 +4,10 @@ AnswerIntent is it {Answer}
 AnswerIntent {Answer} is my answer
 AnswerOnlyIntent {Answer}
 
-AMAZON.StartOverIntent start over
-AMAZON.StartOverIntent reset
 AMAZON.StartOverIntent new flashcard
 AMAZON.StartOverIntent start new flashcard
 AMAZON.StartOverIntent give me a new flashcard
+AMAZON.StartOverIntent begin
 
 DontKnowIntent i don't know
 DontKnowIntent don't know
@@ -22,6 +21,8 @@ DontKnowIntent not sure
 
 LaunchIntent main menu
 LaunchIntent open main menu
+LaunchIntent start over
+LaunchIntent reset
 
 AMAZON.RepeatIntent repeat the question
 AMAZON.RepeatIntent repeat

@@ -24,8 +24,9 @@ class AlexaController < ApplicationController
     @newQuestion = deck.getSample
 
     if @echo_request.intent_name == "LaunchIntent"
-      r.spoken_response = "Welcome to Ruby Flashcards. Are you ready to test your Ruby knowledge? Say new flashcard, or help to begin."
-
+      r.end_session = true
+      logger.info "ATTRIBUTES ARE: #{@echo_request.attributes}"
+      r.spoken_response = "Welcome to Ruby Flashcards. Are you ready to test your Ruby knowledge? Say new flashcard or help to begin."
     elsif @echo_request.intent_name == "AMAZON.StartOverIntent"
       r.end_session = false
       r.spoken_response = "New card. Here is your next question: #{@newQuestion[2]}.
@@ -34,21 +35,10 @@ class AlexaController < ApplicationController
       say the answer in a sentence. for example, the answer is one.
       you can also say i don’t know, skip, or repeat the question"
       add_session_attributes(r)
-
-    elsif @echo_request.intent_name == "DontKnowIntent" #alexa doesn't understand what you're saying
-      r.end_session = false
-      r.add_attribute("currentQuestionIndex", @echo_request.attributes["currentQuestionIndex"])
-      r.add_attribute("correctAnswerText", @echo_request.attributes["correctAnswerText"])
-      r.add_attribute("repeatQuestion", @echo_request.attributes["repeatQuestion"])
-      r.add_attribute("correctAnswerIndex", @echo_request.attributes["correctAnswerIndex"])
-      r.spoken_response = "sorry, I couldn't catch what you were saying.
-      try saying the answer in a sentence. for example, the answer is one.
-      you can also say i don’t know, skip, or repeat the question"
-
     elsif @echo_request.intent_name == "AMAZON.HelpIntent"
       r.end_session = false
       @newQuestion = deck.getSample
-      r.spoken_response = "help menu. to go to the main menu, say main menu, or open main menu.
+      r.spoken_response = "help menu. to go to the main menu, say main menu or open main menu.
       to open a flashcard, you can say start, new flashcard, start new flashcard, or give me a new flashcard.
       once a flashcard is opened, you can say one, two, three or four.
       you can also say the answer in sentence form.
@@ -56,12 +46,10 @@ class AlexaController < ApplicationController
       if you don’t know the answer or would like to skip, you can say i don’t know or skip.
       to repeat the question, say repeat, repeat the the question, say it again, or say the question again."
       add_session_attributes(r)
-
-    elsif @echo_request.intent_name == "AnswerIntent" || @echo_request.intent_name == "AnswerOnlyIntent" || @echo_request.intent_name == "AMAZON.RepeatIntent"
-      if @echo_request.session_attributes?
-
+    elsif @echo_request.intent_name == "AnswerIntent" || @echo_request.intent_name == "AnswerOnlyIntent" || @echo_request.intent_name == "AMAZON.RepeatIntent" || @echo_request.intent_name == "DontKnowIntent"
+      r.end_session = false
+      if @echo_request.attributes["repeatQuestion"] != nil
         if @echo_request.intent_name == "AMAZON.RepeatIntent"
-          r.end_session = false
           r.add_attribute("currentQuestionIndex", @echo_request.attributes["currentQuestionIndex"])
           r.add_attribute("correctAnswerText", @echo_request.attributes["correctAnswerText"])
           r.add_attribute("repeatQuestion", @echo_request.attributes["repeatQuestion"])
@@ -69,19 +57,25 @@ class AlexaController < ApplicationController
           r.spoken_response = "#{@echo_request.attributes["repeatQuestion"]}"
 
         elsif @echo_request.attributes["correctAnswerIndex"] == @echo_request.slots.answer.to_i
-          r.end_session = false
           @newQuestion = deck.getSample
           r.spoken_response = "That is correct! Next question: #{@newQuestion[2]}.
           What is the correct answer? #{@newQuestion[3].join(", ")}"
           r.reprompt_text = "sorry, I couldn't catch what you were saying.
           try saying the answer in a sentence. for example, the answer is one.
           you can also say i don’t know, skip, or repeat the question"
-          r.card_title = "Correct!"
+          r.card_title = "Correct Response"
           r.card_content = "#{@newQuestion[2]}\n The correct answer is #{@newQuestion[4]}"
           add_session_attributes(r)
 
+        elsif @echo_request.intent_name == "DontKnowIntent" #alexa doesn't understand what you're saying
+          r.add_attribute("currentQuestionIndex", @echo_request.attributes["currentQuestionIndex"])
+          r.add_attribute("correctAnswerText", @echo_request.attributes["correctAnswerText"])
+          r.add_attribute("repeatQuestion", @echo_request.attributes["repeatQuestion"])
+          r.add_attribute("correctAnswerIndex", @echo_request.attributes["correctAnswerIndex"])
+          r.spoken_response = "sorry, I couldn't catch what you were saying.
+          try saying the answer in a sentence. for example, the answer is one.
+          you can also say i don’t know, skip, or repeat the question"
         else
-          r.end_session = false
           @newQuestion = deck.getSample
           r.spoken_response = "Sorry, that is incorrect. The answer is #{@echo_request.attributes["correctAnswerIndex"]}, #{@echo_request.attributes["correctAnswerText"]}.
           Let's try another question: #{@newQuestion[2]}.
@@ -89,13 +83,12 @@ class AlexaController < ApplicationController
           r.reprompt_text = "sorry, I couldn't catch what you were saying.
           try saying the answer in a sentence. for example, the answer is one.
           you can also say i don’t know, skip, or repeat the question"
-          r.card_title = "Sorry, that's incorrect."
+          r.card_title = "Incorrect Response."
           r.card_content = "#{@newQuestion[2]}\n The correct answer is #{@newQuestion[4]}"
           add_session_attributes(r)
         end
       else
-        logger.info "session data was lost"
-        r.spoken_response = "session data was lost"
+        r.spoken_response = "ask me for a flashcard to begin. you can say new flashcard or help."
       end
 
     elsif @echo_request.session_ended_request?
@@ -107,13 +100,7 @@ class AlexaController < ApplicationController
       r.spoken_response = "you have chosen to stop. session has ended"
     end
 
-    r.end_session ||= false
-    #r.spoken_response = "session has ended. say main menu, new flashcard, or help to begin again." #this line is causing problems
     render json: r.without_card
-  end
-
-  def show
-    render "The Alexa Flashcards: Ruby server is up and running!"
   end
 
   private
