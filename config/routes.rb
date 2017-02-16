@@ -7,4 +7,5 @@ Rails.application.routes.draw do
   get '/oauth2callback', to: 'alexa#callback' #controller name method name
   get '/', to: 'alexa#redirect'
   post '/', to: 'alexa#index'
+
 end
