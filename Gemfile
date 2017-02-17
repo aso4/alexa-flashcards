@@ -7,7 +7,7 @@ end
 
 gem 'alexa_web_service'
 gem 'figaro'
-gem 'google-api-client', '0.9', require: 'google/apis/analytics_v3'
+gem 'google-api-client', '0.8.2'
 gem 'signet', '0.7.3'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
