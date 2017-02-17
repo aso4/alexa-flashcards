@@ -25,7 +25,6 @@ class AlexaController < ApplicationController
 
     if @echo_request.intent_name == "LaunchIntent"
       r.end_session = true
-      logger.info "ATTRIBUTES ARE: #{@echo_request.attributes}"
       r.spoken_response = "Welcome to Ruby Flashcards. Are you ready to test your Ruby knowledge? Say new flashcard or help to begin."
     elsif @echo_request.intent_name == "AMAZON.StartOverIntent"
       r.end_session = false

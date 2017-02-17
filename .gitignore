@@ -33,3 +33,9 @@ certificate.pem
 
 # Ignore application configuration
 /config/application.yml
+/config/ga_attributes.yml
+/config/ga_config.yml
+
+*.p12
+
+temp.txt
