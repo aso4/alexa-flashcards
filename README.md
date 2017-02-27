@@ -1,24 +1,17 @@
-# README
+# Ruby Flashcards for Alexa -- Level Up Your Ruby Knowledge with Amazon Echo
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Overview
+Ruby Flashcards an Alexa Skill that lets you review flashcards via voice
+commands using any device connected to the Alexa platform.
 
-Things you may want to cover:
+## User Experience
+This script aims to be as helpful as possible, giving a user options to repeat
+questions and access an expanded help menu for response templates.
 
-* Ruby version
+ - Alexa, tell Ruby Flashcards to open main menu.
+ - Alexa, tell Ruby Flashcards to start a new flashcard.
+ - (while flashcard is open) repeat the question
+ - (while flashcard is open) open help menu
+ - (while flashcard is open) start over
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+For a list of supported utterances, check out ./speechAssets/SampleUtterances.txt or say "help" while the skill is activated.
