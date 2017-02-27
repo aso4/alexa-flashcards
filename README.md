@@ -1,4 +1,4 @@
-# Ruby Flashcards for Alexa -- Level Up Your Ruby Knowledge with Amazon Echo
+# Level Up Your Ruby Knowledge with Amazon Alexa
 
 ## Overview
 Ruby Flashcards an Alexa Skill that lets you review flashcards via voice
