@@ -28,11 +28,13 @@ class AlexaController < ApplicationController
 
     if @echo_request.intent_name == "LaunchIntent"
       # Track an Event (all values optional)
-      tracker.build_event(category: 'video', action: 'play', label: 'cars', value: 1).track!
+      tracker.build_event(category: 'intent', action: @echo_request.intent_name, value: 1).track!
 
       r.end_session = true
       r.spoken_response = "Welcome to Ruby Flashcards. Are you ready to test your Ruby knowledge? Say new flashcard or help to begin."
     elsif @echo_request.intent_name == "AMAZON.StartOverIntent"
+      tracker.build_event(category: 'intent', action: @echo_request.intent_name, value: 0).track!
+
       r.end_session = false
       r.spoken_response = "New card. Here is your next question: #{@newQuestion[2]}.
       What is the correct answer? #{@newQuestion[3].join(", ")}. You can say one, two, three, or four. For more response options, say help."
@@ -41,6 +43,7 @@ class AlexaController < ApplicationController
       you can also say i don’t know, skip, or repeat the question"
       add_session_attributes(r)
     elsif @echo_request.intent_name == "AMAZON.HelpIntent"
+      tracker.build_event(category: 'intent', action: @echo_request.intent_name, value: 9).track!
       r.end_session = false
       @newQuestion = deck.getSample
       r.spoken_response = "help menu. to go to the main menu, say main menu or open main menu.
@@ -55,6 +58,7 @@ class AlexaController < ApplicationController
       r.end_session = false
       if @echo_request.attributes["repeatQuestion"] != nil
         if @echo_request.intent_name == "AMAZON.RepeatIntent"
+          tracker.build_event(category: 'intent', action: @echo_request.intent_name, value: 6).track!
           r.add_attribute("currentQuestionIndex", @echo_request.attributes["currentQuestionIndex"])
           r.add_attribute("correctAnswerText", @echo_request.attributes["correctAnswerText"])
           r.add_attribute("repeatQuestion", @echo_request.attributes["repeatQuestion"])
@@ -62,6 +66,7 @@ class AlexaController < ApplicationController
           r.spoken_response = "#{@echo_request.attributes["repeatQuestion"]}"
 
         elsif @echo_request.attributes["correctAnswerIndex"] == @echo_request.slots.answer.to_i
+          tracker.build_event(category: 'intent', action: @echo_request.intent_name, value: 2).track!
           @newQuestion = deck.getSample
           r.spoken_response = "That is correct! Next question: #{@newQuestion[2]}.
           What is the correct answer? #{@newQuestion[3].join(", ")}"
@@ -73,6 +78,7 @@ class AlexaController < ApplicationController
           add_session_attributes(r)
 
         elsif @echo_request.intent_name == "DontKnowIntent" #alexa doesn't understand what you're saying
+          tracker.build_event(category: 'intent', action: @echo_request.intent_name, value: 10).track!
           r.add_attribute("currentQuestionIndex", @echo_request.attributes["currentQuestionIndex"])
           r.add_attribute("correctAnswerText", @echo_request.attributes["correctAnswerText"])
           r.add_attribute("repeatQuestion", @echo_request.attributes["repeatQuestion"])
@@ -82,6 +88,7 @@ class AlexaController < ApplicationController
           you can also say i don’t know, skip, or repeat the question"
         else
           @newQuestion = deck.getSample
+          tracker.build_event(category: 'intent', action: @echo_request.intent_name, value: 3).track!
           r.spoken_response = "Sorry, that is incorrect. The answer is #{@echo_request.attributes["correctAnswerIndex"]}, #{@echo_request.attributes["correctAnswerText"]}.
           Let's try another question: #{@newQuestion[2]}.
           What is the correct answer? #{@newQuestion[3].join(", ")}"
@@ -97,10 +104,12 @@ class AlexaController < ApplicationController
       end
 
     elsif @echo_request.session_ended_request?
+      tracker.build_event(category: 'intent', action: @echo_request.intent_name, value: 8).track!
       r.end_session = true
       r.spoken_response = "session has ended"
 
     elsif @echo_request.intent_name == "AMAZON.StopIntent" ||  @echo_request.intent_name == "AMAZON.CancelIntent"
+      tracker.build_event(category: 'intent', action: @echo_request.intent_name, value: 7).track!
       r.end_session = true
       r.spoken_response = "you have chosen to stop. session has ended"
     end
