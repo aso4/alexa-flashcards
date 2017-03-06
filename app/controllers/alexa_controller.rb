@@ -1,11 +1,14 @@
 require 'alexa_web_service'
 require 'httparty'
 require 'json'
+require 'staccato'
 
 class AlexaController < ApplicationController
   skip_before_action :verify_authenticity_token
 
   def index
+
+    tracker = Staccato.tracker('UA-92171206-1')
 
     @data = request.body.read
     params.merge!(JSON.parse(@data))
@@ -24,6 +27,9 @@ class AlexaController < ApplicationController
     @newQuestion = deck.getSample
 
     if @echo_request.intent_name == "LaunchIntent"
+      # Track an Event (all values optional)
+      tracker.build_event(category: 'video', action: 'play', label: 'cars', value: 1).track!
+
       r.end_session = true
       r.spoken_response = "Welcome to Ruby Flashcards. Are you ready to test your Ruby knowledge? Say new flashcard or help to begin."
     elsif @echo_request.intent_name == "AMAZON.StartOverIntent"
@@ -109,6 +115,39 @@ class AlexaController < ApplicationController
     response.add_attribute("correctAnswerIndex", @newQuestion[1])
     response.add_attribute("correctAnswerText", @newQuestion[4])
   end
+
+  # def trackEvent(category, action, label, value, callback)
+  #   data = {
+  #     v: '1', # API version
+  #     tid: env[GA_TRACKING_ID],
+  #     cid: '555',
+  #     t: 'event', # Event hit type
+  #     ec: category, # Event category
+  #     ea: action, # Event action
+  #     el: label, # Event label
+  #     ev: value # Event value
+  #   }
+  #
+  #   # build post response
+  #   post 'http://www.google-analytics.com/collect', {
+  #     form: data
+  #   }
+  #
+  #   # error callback not included
+  # end
+  #
+  # def ga
+  #   POST /collect HTTP/1.1
+  #   Host: www.google-analytics.com
+  #   #v = 1
+  #   #t = 'event'
+  #   #tid = 'UA-92171206-1'
+  #   #cid = '555'
+  #   ec = 'video'
+  #   el = 'holiday'
+  #   ev = '300'
+  # end
+
 
 
 end
